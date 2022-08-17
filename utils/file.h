@@ -13,5 +13,6 @@ class File
         const short unsigned init(std::string _path)
         {
             
+            return 0;
         }
 };
