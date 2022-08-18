@@ -1,6 +1,5 @@
-testline03
-testline03
-testline00
-testline03
-testline03
-testline02
+is
+a
+test
+for
+files

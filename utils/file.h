@@ -21,7 +21,7 @@ public:
         OVERRIDE
     };
 
-    enum WRITE_ERROR
+    enum WRITE_STATUS
     {
         INVALID_PATH,
         FILE_OPEN_ERROR,
@@ -119,10 +119,10 @@ public:
         return data;
     }
 
-    const WRITE_ERROR write_line(std::string _ln, WRITE_MODE _wm, short unsigned _lnIdx = -1)
+    const WRITE_STATUS write_line(std::string _ln, WRITE_MODE _wm, short unsigned _lnIdx = -1)
     {
         if (filePath.length() <= 0)
-            return WRITE_ERROR::INVALID_PATH;
+            return WRITE_STATUS::INVALID_PATH;
 
         inputStream = std::ifstream();
         outputStream = std::ofstream();
@@ -133,10 +133,10 @@ public:
         outputStream.open(outputPath);
 
         if (inputStream.fail())
-            return WRITE_ERROR::FILE_OPEN_ERROR;
+            return WRITE_STATUS::FILE_OPEN_ERROR;
 
         if (outputStream.fail())
-            return WRITE_ERROR::FILE_OPEN_TMP_ERROR;
+            return WRITE_STATUS::FILE_OPEN_TMP_ERROR;
 
         std::string tmpLine = "";
 
@@ -164,7 +164,7 @@ public:
         case WRITE_MODE::INDEX:
         {
             if (_lnIdx == -1)
-                return WRITE_ERROR::INVALID_INDEX;
+                return WRITE_STATUS::INVALID_INDEX;
 
             int idx = 0;
             while (std::getline(inputStream, tmpLine))
@@ -204,11 +204,163 @@ public:
         const short renameIdx = std::rename(outPath, inPath);
 
         if (deleteIdx != 0)
-            return WRITE_ERROR::DELETE_ERROR;
+            return WRITE_STATUS::DELETE_ERROR;
 
         if (renameIdx != 0)
-            return WRITE_ERROR::RENAME_ERROR;
+            return WRITE_STATUS::RENAME_ERROR;
 
-        return WRITE_ERROR::NONE;
+        return WRITE_STATUS::NONE;
+    }
+
+    const short unsigned write_all_lines(std::vector<std::string> _lines, WRITE_MODE _wm, short unsigned _lnIdx = -1)
+    {
+        if (filePath.length() <= 0)
+            return WRITE_STATUS::INVALID_PATH;
+
+        inputStream = std::ifstream();
+        outputStream = std::ofstream();
+
+        std::string outputPath = filePath + ".tmp";
+
+        inputStream.open(filePath);
+        outputStream.open(outputPath);
+
+        if (inputStream.fail())
+            return WRITE_STATUS::FILE_OPEN_ERROR;
+
+        if (outputStream.fail())
+            return WRITE_STATUS::FILE_OPEN_TMP_ERROR;
+
+        std::string tmpLine = "";
+
+        switch (_wm)
+        {
+        case WRITE_MODE::APPEND:
+        {
+
+            while (std::getline(inputStream, tmpLine))
+                outputStream << tmpLine << std::endl;
+
+            for (unsigned short n = 0; n < _lines.size(); n++)
+                outputStream << _lines[n] << std::endl;
+
+            break;
+        }
+        case WRITE_MODE::FIRST:
+        {
+            for (unsigned short n = 0; n < _lines.size(); n++)
+                outputStream << _lines[n] << std::endl;
+
+            while (std::getline(inputStream, tmpLine))
+                outputStream << tmpLine << std::endl;
+
+            break;
+        }
+        case WRITE_MODE::INDEX:
+        {
+            if (_lnIdx == -1)
+                return WRITE_STATUS::INVALID_INDEX;
+
+            int idx = 0;
+            while (std::getline(inputStream, tmpLine))
+            {
+                if (_lnIdx == idx)
+                {
+                    for (unsigned short n = 0; n < _lines.size(); n++)
+                        outputStream << _lines[n] << std::endl;
+                }
+
+                outputStream << tmpLine << std::endl;
+                idx++;
+            }
+
+            break;
+        }
+        case WRITE_MODE::OVERRIDE:
+        {
+            for (unsigned short n = 0; n < _lines.size(); n++)
+                outputStream << _lines[n] << std::endl;
+            break;
+        }
+        }
+
+        inputStream.close();
+        outputStream.close();
+
+        char inPath[filePath.size() + 1];
+        char outPath[outputPath.size() + 1];
+
+        for (short unsigned n = 0; n < filePath.size(); n++)
+            inPath[n] = filePath[n];
+
+        for (short unsigned n = 0; n < outputPath.size(); n++)
+            outPath[n] = outputPath[n];
+
+        inPath[filePath.size()] = '\0';
+        outputPath[outputPath.size()] = '\0';
+
+        const short deleteIdx = std::remove(inPath);
+        const short renameIdx = std::rename(outPath, inPath);
+
+        if (deleteIdx != 0)
+            return WRITE_STATUS::DELETE_ERROR;
+
+        if (renameIdx != 0)
+            return WRITE_STATUS::RENAME_ERROR;
+
+        return WRITE_STATUS::NONE;
+    }
+
+    const unsigned short delete_line(short unsigned _lnIdx)
+    {
+        if (filePath.size() <= 0)
+            return -1;
+
+        inputStream = std::ifstream();
+        outputStream = std::ofstream();
+
+        std::string tempLine = "";
+        std::string outputPath = filePath + ".tmp";
+
+        inputStream.open(filePath);
+        outputStream.open(outputPath);
+
+        if (inputStream.fail())
+            return -2;
+
+        if (outputStream.fail())
+            return -3;
+
+        int idx = 0;
+        while (std::getline(inputStream, tempLine))
+        {
+            if (_lnIdx != idx)
+                outputStream << tempLine << std::endl;
+
+            idx++;
+        }
+
+        inputStream.close();
+        outputStream.close();
+
+        char inPath[filePath.size() + 1];
+        char outPath[outputPath.size() + 1];
+
+        for (short unsigned n = 0; n < filePath.size(); n++)
+            inPath[n] = filePath[n];
+
+        for (short unsigned n = 0; n < outputPath.size(); n++)
+            outPath[n] = outputPath[n];
+
+        inPath[filePath.size()] = '\0';
+        outputPath[outputPath.size()] = '\0';
+
+        const short deleteIdx = std::remove(inPath);
+        const short renameIdx = std::rename(outPath, inPath);
+
+        if (deleteIdx != 0 || renameIdx != 0)
+            return -4;
+
+        return 0;
     }
 };
