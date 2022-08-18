@@ -363,4 +363,48 @@ public:
 
         return 0;
     }
+
+    const unsigned int get_line_index(std::string _seq)
+    {
+        if (filePath.length() <= 0)
+        {
+            inputStream.close();
+            return -1;
+        }
+
+        inputStream = std::ifstream();
+        inputStream.open(filePath);
+
+        if (inputStream.fail())
+        {
+            inputStream.close();
+            return -2;
+        }
+
+        int idx = 0;
+        std::string tempLine = "";
+
+        while (std::getline(inputStream, tempLine))
+        {
+            int chIdx = 0;
+            for (unsigned short n = 0; n < tempLine.length(); n++)
+            {
+                if (tempLine[n] == _seq[chIdx])
+                    chIdx++;
+                else
+                    chIdx = 0;
+
+                if (chIdx == _seq.length())
+                {
+                    inputStream.close();
+                    return idx;
+                }
+            }
+
+            idx++;
+        }
+
+        inputStream.close();
+        return -3;
+    }
 };
