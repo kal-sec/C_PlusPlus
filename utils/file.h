@@ -211,7 +211,6 @@ public:
 
         return WRITE_STATUS::NONE;
     }
-
     const short unsigned write_all_lines(std::vector<std::string> _lines, WRITE_MODE _wm, short unsigned _lnIdx = -1)
     {
         if (filePath.length() <= 0)
@@ -310,7 +309,6 @@ public:
 
         return WRITE_STATUS::NONE;
     }
-
     const unsigned short delete_line(short unsigned _lnIdx)
     {
         if (filePath.size() <= 0)
@@ -363,7 +361,6 @@ public:
 
         return 0;
     }
-
     const unsigned int get_line_index(std::string _seq)
     {
         if (filePath.length() <= 0)
