@@ -119,22 +119,14 @@ int main()
             int prioritaryOpsCount = 0;
             for (int n = 0; n < ops.size(); n++)
             {
-                while (ops[n] == '/')
+                while (ops[n] == '/' || ops[n] == '*')
                 {
-                    double _total = nums[n] / nums[n + 1];
-                    nums.erase(nums.begin() + n, nums.begin() + (n + 1));
-                    nums.insert(nums.begin() + n, _total);
-                    ops.erase(ops.begin() + n);
-                    continue;
-                }
+                    double _total = (ops[n]=='/')?nums[n] / nums[n + 1]:nums[n] * nums[n + 1];
 
-                while (ops[n] == '*')
-                {
-                    double _total = nums[n] * nums[n + 1];
-                    nums.erase(nums.begin() + n, nums.begin() + (n + 1));
+                    nums.erase(nums.begin() + n);
+                    nums.erase(nums.begin() + n);
                     nums.insert(nums.begin() + n, _total);
                     ops.erase(ops.begin() + n);
-                    continue;
                 }
             }
 
