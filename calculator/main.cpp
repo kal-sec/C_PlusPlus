@@ -1,13 +1,6 @@
 #include <iostream>
 #include <vector>
-/*
-float sum(float n1, float n2);
-float sub(float n1, float n2);
-float div(float n1, float n2);
-float mul(float n1, float n2);
-*/
 
-void menu(void);
 bool is_number(const std::string _s);
 
 std::vector<double> nums = std::vector<double>();
